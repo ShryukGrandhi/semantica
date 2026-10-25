@@ -143,6 +143,7 @@ class TestScientificNotationHandler(unittest.TestCase):
     def test_normalize_precision_keeps_sign(self):
         self.assertEqual(self.handler.normalize_precision(1234.5, 2), 1200.0)
         self.assertEqual(self.handler.normalize_precision(-1234.5, 2), -1200.0)
+        self.assertEqual(self.handler.normalize_precision(-0.000123, 2), -0.00012)
 
 
 if __name__ == "__main__":
