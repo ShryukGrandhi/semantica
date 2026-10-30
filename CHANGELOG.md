@@ -34,6 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Failed structural embeddings were replaced with random vectors** (fixes #1741) by @ShryukGrandhi
+  - `DecisionEmbeddingPipeline._generate_structural_embedding()` returned a random vector when Node2Vec or graph-feature enhancement raised, so `process_decision()` reported `has_structural_embedding=True` and mixed noise into the combined and stored embeddings. It now logs the failure and returns `None`, so the decision is processed with its semantic embedding only and `has_structural_embedding` is `False`
+
 - **Parquet and Arrow relationship export lost graph-backend endpoint names** (refs #2018) by @george07-t
   - `ParquetExporter.export_relationships()` and `ArrowExporter.export_relationships()` read only `source`/`source_id` and `target`/`target_id`, so a record shaped by a graph backend (`start_node_id`/`end_node_id` from Neo4j, FalkorDB and Neptune, `start_id`/`end_id` from raw AGE edges) made Parquet raise `ValidationError` and wrote Arrow rows with empty `source_id` and `target_id`. Both now run the records through `canonical_endpoints` first, so the shared list, order and empty-value rule apply; Parquet keeps its `from_id`/`from`/`to_id`/`to` fallbacks, and an integer id of `0` is now kept as a real id in both, as the shared helper treats it (it used to be dropped by their `or` chains)
   - New tests in `tests/export/test_columnar_exporters_endpoint_names.py` read the written files back for every accepted spelling, an empty canonical value, precedence, an id of `0`, untouched input and mixed batches
