@@ -523,4 +523,7 @@ def test_graph_session_node_embedder_without_gensim():
 
         session = GraphSession(ContextGraph(advanced_analytics=False))
         assert session.node_embedder is None
+        with patch("semantica.explorer.session.NodeEmbedder") as embedder:
+            assert session.node_embedder is None
+            embedder.assert_not_called()
         assert session.centrality is not None
